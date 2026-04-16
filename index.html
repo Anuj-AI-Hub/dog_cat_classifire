@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI CAT vs DOG 🎉</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a0033, #330033, #000033);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+    }
+    .glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .neon-glow {
+      text-shadow: 0 0 25px #ff00ff, 0 0 40px #00ffff;
+    }
+    .drop-zone {
+      transition: all 0.4s ease;
+    }
+    .drop-zone.dragover {
+      transform: scale(1.05);
+      border-color: #ff00ff;
+      box-shadow: 0 0 50px #ff00ff;
+    }
+    .result-card {
+      animation: funPop 0.8s ease forwards;
+    }
+    @keyframes funPop {
+      0% { transform: scale(0.4) rotate(-8deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    /* Mobile Friendly Adjustments */
+    @media (max-width: 640px) {
+      h1 { font-size: 2.5rem; }
+      .text-9xl { font-size: 6rem; }
+      .text-5xl { font-size: 2.25rem; }
+      .p-10 { padding: 1.5rem; }
+      .p-16 { padding: 2.5rem 1.5rem; }
+    }
+  </style>
+</head>
+<body class="text-white flex items-center justify-center p-4 sm:p-6">
+  <div class="max-w-lg w-full mx-auto">
+
+    <!-- Header -->
+    <div class="text-center mb-8 sm:mb-10">
+      <div class="flex justify-center gap-4 text-5xl sm:text-6xl mb-4">
+        <span>🐱</span>
+        <span class="text-4xl sm:text-5xl text-pink-400">VS</span>
+        <span>🐶</span>
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-bold neon-glow tracking-tighter">WHO IS IT?</h1>
+      <p class="text-pink-300 text-lg sm:text-xl mt-2">Super Fun AI Classifier</p>
+    </div>
+
+    <div class="glass rounded-3xl p-6 sm:p-10 shadow-2xl">
+
+      <!-- Upload Area -->
+      <div id="uploadArea" 
+           class="drop-zone border-4 border-dashed border-pink-400 hover:border-pink-300 rounded-3xl p-12 sm:p-16 text-center cursor-pointer">
+        <div class="text-7xl sm:text-8xl mb-6">📸</div>
+        <p class="text-2xl sm:text-3xl font-bold mb-2">Photo Daal Do!</p>
+        <p class="text-pink-200 mb-6 text-base sm:text-lg">Cat hai ya Dog? AI bata dega 😎</p>
+        
+        <label class="bg-gradient-to-r from-pink-500 to-purple-600 px-8 sm:px-10 py-4 sm:py-5 rounded-2xl text-lg font-semibold cursor-pointer hover:scale-105 transition inline-flex items-center gap-3">
+          <i class="fas fa-camera"></i>
+          Image Choose Karo
+          <input type="file" id="fileInput" accept="image/*" class="hidden"/>
+        </label>
+      </div>
+
+      <!-- Preview Area -->
+      <div id="previewArea" class="hidden mt-8">
+        <div class="glass rounded-3xl p-4 sm:p-6">
+          <img id="previewImage" class="w-full rounded-2xl max-h-80 sm:max-h-96 object-contain" alt="Preview"/>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-6">
+          <button onclick="resetAll()" 
+                  class="py-4 sm:py-5 bg-white/10 hover:bg-white/20 rounded-2xl font-medium text-sm sm:text-base">
+            Change Photo
+          </button>
+          <button onclick="predictImage()" 
+                  class="py-4 sm:py-5 bg-gradient-to-r from-pink-500 to-violet-600 rounded-2xl font-bold text-sm sm:text-base hover:brightness-110">
+            🔥 AI Se Pucho
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading" class="hidden text-center py-16 sm:py-20">
+        <div class="text-6xl sm:text-7xl mb-6 animate-bounce">🤖</div>
+        <p class="text-2xl sm:text-3xl font-bold text-pink-300">AI Soch Raha Hai...</p>
+        <p class="text-slate-400 mt-3 text-base">Cat ya Dog? Jaldi bata raha hai</p>
+      </div>
+
+      <!-- Result -->
+      <div id="resultArea" class="hidden result-card glass rounded-3xl p-8 sm:p-10 text-center">
+        <div id="resultEmoji" class="text-8xl sm:text-9xl mb-6"></div>
+        <h2 id="resultText" class="text-4xl sm:text-5xl font-black mb-8"></h2>
+
+        <div class="mb-10">
+          <p class="text-pink-200 text-sm mb-3 tracking-widest">CONFIDENCE 🔥</p>
+          <div class="h-4 bg-slate-700 rounded-full overflow-hidden">
+            <div id="confidenceBar" class="h-full bg-gradient-to-r from-pink-400 to-yellow-400 w-0 transition-all duration-1000"></div>
+          </div>
+          <p id="confidenceText" class="text-4xl font-bold text-yellow-300 mt-4"></p>
+        </div>
+
+        <div class="rounded-2xl overflow-hidden border-2 border-white/20">
+          <img id="resultImage" class="w-full" alt="Result"/>
+        </div>
+
+        <button onclick="resetAll()" 
+                class="mt-10 w-full py-5 sm:py-6 bg-white/10 hover:bg-white/20 rounded-2xl text-lg font-medium">
+          🎲 Ek Aur Photo Try Karo
+        </button>
+      </div>
+    </div>
+
+    <p class="text-center text-pink-300/60 text-sm mt-8">Your Own Trained Model • Made with ❤️</p>
+  </div>
+
+  <script>
+    let selectedFile = null;
+
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const previewArea = document.getElementById('previewArea');
+    const previewImage = document.getElementById('previewImage');
+    const loading = document.getElementById('loading');
+    const resultArea = document.getElementById('resultArea');
+    const resultEmoji = document.getElementById('resultEmoji');
+    const resultText = document.getElementById('resultText');
+    const confidenceBar = document.getElementById('confidenceBar');
+    const confidenceText = document.getElementById('confidenceText');
+    const resultImage = document.getElementById('resultImage');
+
+    // Upload Handlers
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => e.target.files[0] && handleFile(e.target.files[0]));
+
+    // Drag & Drop
+    uploadArea.addEventListener('dragover', e => { 
+      e.preventDefault(); 
+      uploadArea.classList.add('dragover'); 
+    });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFile(file) {
+      selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        previewImage.src = e.target.result;
+        uploadArea.classList.add('hidden');
+        previewArea.classList.remove('hidden');
+        resultArea.classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function predictImage() {
+      if (!selectedFile) return;
+
+      previewArea.classList.add('hidden');
+      loading.classList.remove('hidden');
+      resultArea.classList.add('hidden');
+
+      const formData = new FormData();
+      formData.append('image', selectedFile);
+
+      try {
+        const res = await fetch('http://127.0.0.1:5000/predict', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        loading.classList.add('hidden');
+        resultArea.classList.remove('hidden');
+
+        const isDog = data.class === "dog";
+        resultEmoji.textContent = isDog ? "🐶" : "🐱";
+        resultText.textContent = isDog ? "Woof! It's a DOG!" : "Meow! It's a CAT!";
+        resultText.className = `text-4xl sm:text-5xl font-black mb-8 ${isDog ? 'text-orange-400' : 'text-pink-400'}`;
+
+        const percent = (data.confidence * 100).toFixed(1);
+        confidenceText.textContent = `${percent}%`;
+        confidenceBar.style.width = `${percent}%`;
+
+        resultImage.src = previewImage.src;
+
+      } catch (err) {
+        loading.classList.add('hidden');
+        alert("Backend se connect nahi ho pa raha.\nKya python app.py chal raha hai?");
+      }
+    }
+
+    function resetAll() {
+      selectedFile = null;
+      uploadArea.classList.remove('hidden');
+      previewArea.classList.add('hidden');
+      loading.classList.add('hidden');
+      resultArea.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
