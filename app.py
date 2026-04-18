@@ -28,15 +28,14 @@ def create_model():
     ])
     return model
 
-print("🔄 Model architecture bana raha hoon + weights load kar raha hoon...")
+print("🔄 Loading model architecture and weights...")
 
 try:
     model = create_model()
     model.load_weights(MODEL_WEIGHTS_PATH)
     print("✅ Model weights successfully loaded!")
-    # model.summary()   # Comment kar diya hai taaki output clean rahe
 except Exception as e:
-    print("❌ Weights load failed!", str(e))
+    print("❌ Model load failed!", str(e))
     exit()
 
 # ====================== ROUTES ======================
@@ -81,5 +80,6 @@ def predict():
 
 
 if __name__ == '__main__':
-    print("\n🚀 Server started → http://127.0.0.1:5000")
-    app.run(debug=False, host='0.0.0.0', port=5000)   # debug=False kar do
+    port = int(os.environ.get("PORT", 5000))
+    print(f"\n🚀 Server started on port {port}")
+    app.run(debug=False, host='0.0.0.0', port=port)
